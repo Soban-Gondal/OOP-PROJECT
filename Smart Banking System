@@ -49,3 +49,58 @@ interface SecureAccount {
 interface EMIComputable {
     double calculateEMI(double principal, double rate, int time);
 }
+
+// ============================================================
+// SECTION 2 – CUSTOM EXCEPTION
+// ============================================================
+
+class BankException extends Exception {
+    public BankException(String message) {
+        super(message);
+    }
+}
+
+// ============================================================
+// SECTION 3 – TRANSACTION CLASS  (bank.transactions)
+// ============================================================
+
+class Transaction implements Serializable {
+    private String transactionId;
+    private String type;          // DEPOSIT / WITHDRAW / TRANSFER
+    private double amount;
+    private Date timestamp;
+    private String sourceAccount;
+    private String targetAccount;
+    private String status;        // SUCCESS / FAILED / FLAGGED
+
+    public Transaction(String type, double amount,
+                       String sourceAccount, String targetAccount) {
+        this.transactionId = "TXN" + System.currentTimeMillis();
+        this.type          = type;
+        this.amount        = amount;
+        this.sourceAccount = sourceAccount;
+        this.targetAccount = targetAccount;
+        this.timestamp     = new Date();
+        this.status        = "SUCCESS";
+    }
+
+    // getters
+    public String getTransactionId() { return transactionId; }
+    public String getType()          { return type; }
+    public double getAmount()        { return amount; }
+    public Date   getTimestamp()     { return timestamp; }
+    public String getStatus()        { return status; }
+    public String getSourceAccount() { return sourceAccount; }
+
+    public void setStatus(String status) { this.status = status; }
+
+    @Override
+    public String toString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        return String.format("[%s] %s | Amount: %.2f | From: %s | To: %s | Status: %s | Time: %s",
+                transactionId, type, amount, sourceAccount,
+                targetAccount == null ? "N/A" : targetAccount,
+                status, sdf.format(timestamp));
+    }
+}
+
