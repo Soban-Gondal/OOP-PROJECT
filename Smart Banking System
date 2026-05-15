@@ -9,3 +9,43 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+
+interface TransactionOperations {
+    void deposit(double amount) throws BankException;
+    void withdraw(double amount) throws BankException;
+    void transfer(BankAccount target, double amount) throws BankException;
+}
+
+interface LoanOperations {
+    void applyLoan(double amount) throws BankException;
+    double calculateEMI();
+    void repayLoan(double amount) throws BankException;
+}
+
+interface Authenticatable {
+    boolean login(String username, String password);
+    void logout();
+}
+
+interface FraudCheckable {
+    boolean detectFraud(Transaction t);
+}
+
+interface ReportGeneratable {
+    String generateReport();
+}
+
+interface DataStorable {
+    void saveData() throws BankException;
+    void loadData() throws BankException;
+}
+
+interface SecureAccount {
+    void freezeAccount();
+    void unfreezeAccount();
+    boolean isFrozen();
+}
+
+interface EMIComputable {
+    double calculateEMI(double principal, double rate, int time);
+}
