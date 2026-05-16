@@ -103,4 +103,63 @@ class Transaction implements Serializable {
                 status, sdf.format(timestamp));
     }
 }
+// ============================================================
+// SECTION 4 – BANK ACCOUNT  (bank.accounts)
+// ============================================================
+abstract class BankAccount implements TransactionOperations, SecureAccount, Serializable {
+    protected String accountNumber;
+    protected double balance;
+    protected String owner;          // customer id
+    protected boolean isFrozen;
+    protected List<Transaction> transactions;
 
+    public BankAccount(String accountNumber, String owner, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.owner         = owner;
+        this.balance       = initialBalance;
+        this.isFrozen      = false;
+        this.transactions  = new ArrayList<>();
+    }
+    // ---------- TransactionOperations ----------
+    @Override
+    public void deposit(double amount) throws BankException {
+        if (isFrozen)
+            throw new BankException("Account is frozen. Cannot deposit.");
+        if (amount <= 0)
+            throw new BankException("Deposit amount must be positive.");
+
+        balance += amount;
+        Transaction t = new Transaction("DEPOSIT", amount, accountNumber, null);
+        transactions.add(t);
+        System.out.println("Deposited: " + amount);
+    }
+    @Override
+    public void withdraw(double amount) throws BankException {
+        if (isFrozen)
+            throw new BankException("Account is frozen. Cannot withdraw.");
+        if (amount <= 0)
+            throw new BankException("Withdrawal amount must be positive.");
+        if (amount > balance)
+            throw new BankException("Insufficient balance.");
+
+        balance -= amount;
+        Transaction t = new Transaction("WITHDRAW", amount, accountNumber, null);
+        transactions.add(t);
+        System.out.println("Withdrawn: " + amount);
+    }
+    @Override
+    public void transfer(BankAccount target, double amount) throws BankException {
+        if (isFrozen)
+            throw new BankException("Account is frozen. Cannot transfer.");
+        if (amount <= 0)
+            throw new BankException("Transfer amount must be positive.");
+        if (amount > balance)
+            throw new BankException("Insufficient balance for transfer.");
+
+        balance -= amount;
+        target.balance += amount;
+        Transaction t = new Transaction("TRANSFER", amount, accountNumber, target.accountNumber);
+        transactions.add(t);
+        target.transactions.add(t);
+        System.out.println("Transferred " + amount + " to " + target.accountNumber);
+    }
